@@ -1,0 +1,13 @@
+server:
+  port: 8848
+spring:
+  application:
+    name: service-mypro
+  ## 配置zookeeper地址
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181
+      discovery:
+        prefer-ip-address: true
+        metadata:
+          env: zyl #自定义metadata标签
