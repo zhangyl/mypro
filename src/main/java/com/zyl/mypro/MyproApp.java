@@ -7,10 +7,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class Test extends SpringBootServletInitializer {
+public class MyproApp extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Test.class, args);
+		SpringApplication.run(MyproApp.class, args);
 		//增加输出窗口打印成功信息 方便用户看到启动成功后的标志
 		System.out.println("helloworld application success...");
 
