@@ -8,6 +8,7 @@ spring:
     zookeeper:
       connect-string: localhost:2181
       discovery:
+        enabled: true # 根据环境实际情况开启或者关闭
         prefer-ip-address: true
         metadata:
           env: zyl #自定义metadata标签

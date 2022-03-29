@@ -24,8 +24,15 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class IndexController {
 	
     @GetMapping("/hello/{name}")
-    public String say(HttpServletRequest request, @PathVariable("name") String name){
-    	return "Hello " + name;
+    @ResponseBody
+    public HelloVO say(HttpServletRequest request, @PathVariable("name") String name){
+    	
+    	String beta = request.getHeader("beta");
+    	HelloVO vo = new HelloVO();
+    	vo.setName(name);
+    	vo.setMessage("Hello " + name);
+    	vo.setBeta(beta);
+    	return vo;
     }
 
     /**
