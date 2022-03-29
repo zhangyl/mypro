@@ -22,7 +22,13 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 @RestController
 public class IndexController {
-	
+	//模拟beta用户
+	private Set<String> betaSet = new HashSet<>();
+	{
+		betaSet.add("zyl");
+		betaSet.add("wqc");
+		betaSet.add("zz");
+	}
     @GetMapping("/hello/{name}")
     @ResponseBody
     public HelloVO say(HttpServletRequest request, @PathVariable("name") String name){
@@ -32,6 +38,22 @@ public class IndexController {
     	vo.setName(name);
     	vo.setMessage("Hello " + name);
     	vo.setBeta(beta);
+    	return vo;
+    }
+    @GetMapping("/login/{name}")
+    @ResponseBody
+    public HelloVO login(HttpServletRequest request, @PathVariable("name") String name){
+
+    	HelloVO vo = new HelloVO();
+    	vo.setName(name);
+    	vo.setMessage("Hello " + name);
+    	//如果是zyl
+    	if(name != null && betaSet.contains(name)) {
+    		vo.setBeta("b");
+    	} else {
+    		vo.setBeta("a");
+    	}
+    	
     	return vo;
     }
 
