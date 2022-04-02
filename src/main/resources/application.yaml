@@ -12,3 +12,13 @@ spring:
         prefer-ip-address: true
         metadata:
           env: zyl #自定义metadata标签
+  datasource:
+    username: root
+    password: zyl123456
+    url: jdbc:mysql://127.0.0.1:3306/multi_default?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:mybatis/*Mapper.xml
+  config-location: classpath:mybatis-config.xml
+

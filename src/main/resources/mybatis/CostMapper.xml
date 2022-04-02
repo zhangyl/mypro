@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyl.mypro.mapper.CostMapper">
+  <resultMap id="BaseResultMap" type="com.zyl.mypro.bean.Cost">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="money" jdbcType="INTEGER" property="money" />
+    <result column="ent_code" jdbcType="VARCHAR" property="entCode" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id, money, ent_code
+  </sql>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from cost
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <insert id="insert" parameterType="com.zyl.mypro.bean.Cost">
+    insert into cost (id, money, ent_code)
+    values (#{id,jdbcType=INTEGER}, #{money,jdbcType=INTEGER}, #{entCode})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.zyl.mypro.bean.Cost">
+    insert into cost
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="money != null">
+        money,
+      </if>
+      <if test="entCode != null">
+        ent_code,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="money != null">
+        #{money,jdbcType=INTEGER},
+      </if>
+      <if test="entCode != null">
+        #{entCode},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.zyl.mypro.bean.Cost">
+    update cost
+    <set>
+      <if test="money != null">
+        money = #{money,jdbcType=INTEGER},
+      </if>
+      <if test="money != null">
+        ent_code = #{entCode},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zyl.mypro.bean.Cost">
+    update cost
+    set 
+    	money = #{money,jdbcType=INTEGER},
+    	ent_code = #{entCode}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="sum" resultType="int">
+  	select sum(money) from cost
+  </select>
+</mapper>
