@@ -1,6 +1,8 @@
 package com.zyl.mypro.controller;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +22,8 @@ import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import com.zyl.mypro.util.JwtUtil;
+
 @RestController
 public class IndexController {
 	//模拟beta用户
@@ -31,8 +35,9 @@ public class IndexController {
 	}
     @GetMapping("/hello/{name}")
     @ResponseBody
-    public HelloVO say(HttpServletRequest request, @PathVariable("name") String name){
-    	
+    public HelloVO say(HttpServletRequest request, 
+    		HttpServletResponse response, 
+    		@PathVariable("name") String name){
     	String beta = request.getHeader("beta");
     	HelloVO vo = new HelloVO();
     	vo.setName(name);
@@ -40,20 +45,30 @@ public class IndexController {
     	vo.setBeta(beta);
     	return vo;
     }
-    @GetMapping("/login/{name}")
+    @GetMapping("/login")
     @ResponseBody
-    public HelloVO login(HttpServletRequest request, @PathVariable("name") String name){
-
+    public HelloVO login(HttpServletRequest request, 
+    		HttpServletResponse response){
+    	String name = request.getParameter("name");
     	HelloVO vo = new HelloVO();
     	vo.setName(name);
     	vo.setMessage("Hello " + name);
-    	//如果是zyl
+
+        Map<String, Object> claims = new HashMap<>(16);
+        claims.put("userId", name);
+        claims.put("username", name);
     	if(name != null && betaSet.contains(name)) {
     		vo.setBeta("b");
-    	} else {
-    		vo.setBeta("a");
+    		claims.put("beta", "b");
     	}
-    	
+		String token = JwtUtil.generalTocken(claims);
+		String pToken = Base64.getUrlEncoder().encodeToString(token.getBytes());
+    	try {
+			response.sendRedirect("http://zyl.com/a.html?p=" + pToken);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	return vo;
     }
 
