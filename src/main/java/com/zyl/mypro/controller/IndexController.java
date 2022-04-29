@@ -1,9 +1,11 @@
 package com.zyl.mypro.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,7 +31,7 @@ import com.zyl.mypro.util.JwtUtil;
 
 @RestController
 public class IndexController {
-	
+	int count = 0;
 	@Autowired
 	CostService costService;
 	
@@ -40,8 +42,18 @@ public class IndexController {
 		betaSet.add("wqc");
 		betaSet.add("zz");
 	}
-	
-	
+    @GetMapping("/beta")
+    @ResponseBody
+	public List<String> beta() {
+		List<String> list = new ArrayList<>();
+		
+		list.add("A");
+		if((count++) % 2==0) {
+			list.add("B");
+		}
+		
+		return list;
+	}
     @GetMapping("/hello/{name}")
     @ResponseBody
     public HelloVO say(HttpServletRequest request, 

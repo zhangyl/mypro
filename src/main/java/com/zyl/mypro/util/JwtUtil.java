@@ -9,6 +9,9 @@ import java.util.UUID;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -86,5 +89,23 @@ public class JwtUtil {
         return claims;
     }
  
- 
+	public static void main(String[] args) {
+		//bosss登录后跳转的参数
+		String s = "eyJlbnROYW1lIjoiVFRUdGVzdCVFNSU5NSVCNSVFNSU5NSVCNSVFNSU5NSVCNSVFNSU5NSVCNSVFNSU5NSVCNSIsImFwaVJvb3QiOiJodHRwcyUzQSUyRiUyRm5nLm1heWN1ci5jb20iLCJlbnRDb2RlIjoiRUMyMDAzMDcxR1dUQkgxSCIsImFwcEtleSI6IldFQiIsInNvdXJjZSI6Imh0dHBzJTNBJTJGJTJGbmcubWF5Y3VyLmNvbSUyRm5nLWxhbmRpbmciLCJsYW5nIjoiemgiLCJhY2Nlc3NUb2tlbiI6ImV5SmhiR2NpT2lKSVV6STFOaUo5LmV5SnFkR2tpT2lKdFlYbGpkWEpmYW5kMFgybGtJaXdpYzNWaUlqb2lWVWt5TURBMU1qZ3hWbGszVHpWSFZDSXNJbWxoZENJNk1UWTBPVEl4TWpBM09Td2lZWFZrSWpvaVYwVkNJaXdpWlhod0lqb3hOalV4T0RBME1EYzVMQ0psYm5SRGIyUmxJam9pUlVNeU1EQXpNRGN4UjFkVVFrZ3hTQ0lzSW1Oc2RYTjBaWEpEYjJSbElqb2lUa2NpZlEuT1M4eWZIVGJuOFphcDdYNUNjeVdhM01CMWhRTzlnUzhJZ0FEQjdacnl6WSIsImNkbiI6Imh0dHBzJTNBJTJGJTJGY2RuLm1heWN1ci5jb20iLCJ1c2VyQ29kZSI6IlVJMjAwNTI4MVZZN081R1QifQ==";
+		byte[] decodeByte = Base64.getUrlDecoder().decode(s.getBytes());
+		String decode = new String(decodeByte);
+		
+		//从boss返回的字符串解析出jwtToken部分
+		JSONObject json = JSON.parseObject(decode);
+		String jwtToken = json.get("accessToken").toString();
+		
+		//jwtToken部分找出payload部分
+		String[] jwtTokenArray = jwtToken.split("\\.");
+		String payloadEncode = jwtTokenArray[1];
+		byte[] payloadByte = Base64.getDecoder().decode(payloadEncode);
+		String payload = new String(payloadByte);
+		
+		System.out.println(payload);
+		
+	} 
 }

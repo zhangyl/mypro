@@ -1,5 +1,6 @@
 package com.zyl.mypro.aop;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.ibatis.executor.Executor;
@@ -16,6 +17,9 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLStatement;
 
 /**
  * 自定义 MyBatis 拦截器
@@ -59,9 +63,16 @@ public class MybatisInterceptor implements Interceptor {
         
         String origSql = boundSql.getSql();
         logger.info("原始SQL: {}", origSql);
-
+        //自定义sql改写
+        MySelectVisitor visitor = new MySelectVisitor();
+        List<SQLStatement> list = SQLUtils.parseStatements(origSql, "mysql");
         // 组装新的 sql
-        String newSql = origSql + " limit 1";
+        String newSql = origSql;
+        for(SQLStatement statement : list) {
+        	statement.accept(visitor);
+        	newSql = statement.toString();
+        	System.out.println("newSql => "+newSql);
+        }
 
         // 重新new一个查询语句对象
         BoundSql newBoundSql = new BoundSql(ms.getConfiguration(), newSql,
