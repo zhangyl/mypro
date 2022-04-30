@@ -9,7 +9,6 @@ import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLInListExpr;
-import com.alibaba.druid.sql.ast.expr.SQLNotExpr;
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitorAdapter;
@@ -61,25 +60,27 @@ public class MySelectVisitor extends MySqlASTVisitorAdapter {
 		allOpExpr = SQLBinaryOpExpr.and(allOpExpr, inListOpExpr);
         return allOpExpr;
     }
+    /**
+     * 动态拼写not in
+     * @param x
+     * @return
+     */
     public SQLExpr getNewExprNotIn(SQLBinaryOpExpr x) {
-  
-//    	SQLNotExpr notExpr = new SQLNotExpr();
     	
 		SQLExpr allOpExpr = x;
+		
 		SQLInListExpr inListOpExpr = new SQLInListExpr();
-		inListOpExpr.setNot(true);
+		inListOpExpr.setNot(true);// not in
+		
     	String tableName = "cost";
     	String columnName = "ent_code";
 		inListOpExpr.setExpr(new SQLPropertyExpr(tableName, columnName));
-    	
-//		inListOpExpr.setExpr(notExpr);
 		
 		List<SQLExpr> list = new ArrayList<>();
 		list.add(new SQLCharExpr("13858181234"));
 		list.add(new SQLCharExpr("13858181235"));
 		inListOpExpr.setTargetList(list);
 		
-//		notExpr.setExpr(inListOpExpr);
 		allOpExpr = SQLBinaryOpExpr.and(allOpExpr, inListOpExpr);
         return allOpExpr;
     }
