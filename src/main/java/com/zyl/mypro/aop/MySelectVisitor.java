@@ -9,6 +9,7 @@ import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLInListExpr;
+import com.alibaba.druid.sql.ast.expr.SQLNotExpr;
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitorAdapter;
@@ -28,13 +29,16 @@ public class MySelectVisitor extends MySqlASTVisitorAdapter {
         SQLObject parent = x.getParent();
         // where块
         if (parent instanceof MySqlSelectQueryBlock) {
-            SQLExpr newExpr = getNewExprIn(x);
+            SQLExpr newExpr = getNewExprNotIn(x);
+//            SQLExpr newExpr = getNewExprIn(x);
             ((MySqlSelectQueryBlock) parent).setWhere(newExpr);
             return false;
         }
         
         return false;
     }
+
+
     /**
      * sql改写，动态拼接in demo
      * @param x
@@ -43,7 +47,6 @@ public class MySelectVisitor extends MySqlASTVisitorAdapter {
      */
     public SQLExpr getNewExprIn(SQLBinaryOpExpr x) {
 		SQLExpr allOpExpr = x;
-    	
 		SQLInListExpr inListOpExpr = new SQLInListExpr();
 		
     	String tableName = "cost";
@@ -56,7 +59,28 @@ public class MySelectVisitor extends MySqlASTVisitorAdapter {
 		inListOpExpr.setTargetList(list);
 		
 		allOpExpr = SQLBinaryOpExpr.and(allOpExpr, inListOpExpr);
+        return allOpExpr;
+    }
+    public SQLExpr getNewExprNotIn(SQLBinaryOpExpr x) {
+  
+//    	SQLNotExpr notExpr = new SQLNotExpr();
+    	
+		SQLExpr allOpExpr = x;
+		SQLInListExpr inListOpExpr = new SQLInListExpr();
+		inListOpExpr.setNot(true);
+    	String tableName = "cost";
+    	String columnName = "ent_code";
+		inListOpExpr.setExpr(new SQLPropertyExpr(tableName, columnName));
+    	
+//		inListOpExpr.setExpr(notExpr);
 		
+		List<SQLExpr> list = new ArrayList<>();
+		list.add(new SQLCharExpr("13858181234"));
+		list.add(new SQLCharExpr("13858181235"));
+		inListOpExpr.setTargetList(list);
+		
+//		notExpr.setExpr(inListOpExpr);
+		allOpExpr = SQLBinaryOpExpr.and(allOpExpr, inListOpExpr);
         return allOpExpr;
     }
     /**
