@@ -15,10 +15,6 @@ import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitorAdapter;
 
 /**
  * 查询语句字段追加
- *
- * @author maple
- * @version 1.0
- * @since 2021-11-22 00:50
  */
 public class MySelectVisitor extends MySqlASTVisitorAdapter {
 

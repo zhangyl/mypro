@@ -64,7 +64,8 @@ public class MybatisInterceptor implements Interceptor {
         String origSql = boundSql.getSql();
         logger.info("原始SQL: {}", origSql);
         //自定义sql改写
-        MySelectVisitor visitor = new MySelectVisitor();
+//        MySelectVisitor visitor = new MySelectVisitor();
+        MySelectVisitor2 visitor = new MySelectVisitor2();
         List<SQLStatement> list = SQLUtils.parseStatements(origSql, "mysql");
         // 组装新的 sql
         String newSql = origSql;
