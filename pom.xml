@@ -83,7 +83,17 @@
 	    <dependency>
 	      <groupId>org.projectlombok</groupId>
 	      <artifactId>lombok</artifactId>
-	    </dependency>									
+	    </dependency>	
+	    <dependency>
+			<groupId>com.maycur</groupId>
+			<artifactId>mybatis-canary-plugin</artifactId>
+			<version>0.0.1-SNAPSHOT</version>	    
+	    </dependency>
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>4.1.6</version>
+        </dependency>	    								
 	</dependencies>
 
 	<build>

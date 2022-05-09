@@ -25,6 +25,8 @@ import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zyl.mypro.bean.Cost;
 import com.zyl.mypro.service.CostService;
 import com.zyl.mypro.util.JwtUtil;
@@ -32,7 +34,7 @@ import com.zyl.mypro.util.JwtUtil;
 @RestController
 public class IndexController {
 	int count = 0;
-	@Autowired
+	@Autowired(required = false)
 	CostService costService;
 	
 	//模拟beta用户
@@ -74,7 +76,10 @@ public class IndexController {
     	HelloVO vo = new HelloVO();
     	vo.setName(name);
     	vo.setMessage("Hello " + name);
+    	PageHelper.startPage(1, 20);
     	
+    	PageInfo<String> pageInfo = PageHelper.startPage(1, 20).doSelectPageInfo(() -> costService.select(1));
+    	System.out.println(pageInfo);
     	Cost cost = costService.select(1);
     	if(cost != null) {
     		vo.setBeta("b");
