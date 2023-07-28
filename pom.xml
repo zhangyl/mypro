@@ -57,11 +57,6 @@
 		</dependency>
 		<!-- end 注册中心依赖 -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>2.2.2</version>
@@ -83,17 +78,7 @@
 	    <dependency>
 	      <groupId>org.projectlombok</groupId>
 	      <artifactId>lombok</artifactId>
-	    </dependency>	
-	    <dependency>
-			<groupId>com.maycur</groupId>
-			<artifactId>mybatis-canary-plugin</artifactId>
-			<version>0.0.1-SNAPSHOT</version>	    
 	    </dependency>
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>4.1.6</version>
-        </dependency>	    								
 	</dependencies>
 
 	<build>
