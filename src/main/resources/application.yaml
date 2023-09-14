@@ -13,13 +13,50 @@ spring:
         metadata:
           env: zyl #自定义metadata标签
   datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/zyl?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: zyl123456
-    url: jdbc:mysql://127.0.0.1:3306/multi_default?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
-    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  shardingsphere:
+    database:
+      name: ds #默认数据源
+    props:
+      sql-show:true
+    mode:
+      type: Standalone
+    datasource: #数据源
+      names: ds0
+      ds:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://127.0.0.1:3306/zyl?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+        username: root
+        password: zyl123456
+      ds0:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/zyl?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+        username: root
+        password: zyl123456
+    rules:
+      sharding:
+        sharding-algorithms:
+          my-table:
+            type: INLINE
+            props:
+              algorithm-expression: cost_$->{id%2}
+        tables:
+          cost:
+            actual-data-nodes: ds0.cost_0, ds0.cost_1, ds0.cost_zyl
+            tableStrategy:
+              standard:
+                sharding-column: id
+                sharding-algorithm-name: my-table
 
 #mybatis配置采用java配置，所以注释掉。见：com.zyl.mypro.config.MyBatisConfig
-#mybatis:
+# mybatis:
   # mapper-locations: classpath:mybatis/*Mapper.xml
   # config-location: classpath:mybatis-config.xml
 

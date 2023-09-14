@@ -1,0 +1,25 @@
+server:
+  port: 8848
+spring:
+  application:
+    name: service-mypro
+  ## 配置zookeeper地址
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181
+      discovery:
+        enabled: true # 根据环境实际情况开启或者关闭
+        prefer-ip-address: true
+        metadata:
+          env: zyl #自定义metadata标签
+  datasource:
+    username: root
+    password: zyl123456
+    url: jdbc:mysql://127.0.0.1:3306/multi_default?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+#mybatis配置采用java配置，所以注释掉。见：com.zyl.mypro.config.MyBatisConfig
+#mybatis:
+  # mapper-locations: classpath:mybatis/*Mapper.xml
+  # config-location: classpath:mybatis-config.xml
+

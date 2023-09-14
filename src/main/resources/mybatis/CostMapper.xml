@@ -15,13 +15,6 @@
     select 
     <include refid="Base_Column_List" />
     from cost where id = #{id}
-    union all
-    select
-    <include refid="Base_Column_List" />
-    from cost where money > #{id}
-    union all
-	select id, money, ent_code from (select id, money, ent_code from cost a where a.id = 50 ) b 
-    where money > 200
   </select>
   
   <insert id="insert" parameterType="com.zyl.mypro.bean.Cost">
