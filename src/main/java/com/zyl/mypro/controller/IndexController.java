@@ -59,15 +59,15 @@ public class IndexController {
 
 	@GetMapping("/shardingsphereTest")
 	@ResponseBody
-	public Cost shardingsphereTest(HttpServletRequest request){
+	public List<Cost> shardingsphereTest(HttpServletRequest request){
 
-		String id = request.getParameter("id");
-		Cost cost = costService.select(Integer.parseInt(id));
+		String entCode = request.getParameter("entCode");
+		List<Cost> costList = costService.listByEntCode(entCode);
 
-		if(cost == null) {
+		if(costList.isEmpty()) {
 			log.debug("查询Cost结果为空");
 		}
-		return cost;
+		return costList;
 	}
 
     @GetMapping("/login")

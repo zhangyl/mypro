@@ -8,6 +8,8 @@ import com.zyl.mypro.bean.Cost;
 import com.zyl.mypro.mapper.CostMapper;
 import com.zyl.mypro.service.CostService;
 
+import java.util.List;
+
 @Service
 public class CostServiceImpl implements CostService {
 
@@ -27,6 +29,11 @@ public class CostServiceImpl implements CostService {
 	@Override
 	public Cost select(Integer id) {
 		return costMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public List<Cost> listByEntCode(String entCode) {
+		return costMapper.listByEntCode(entCode);
 	}
 
 }

@@ -1,8 +1,9 @@
 package com.zyl.mypro.mapper;
 
+import com.zyl.mypro.bean.Cost;
 import org.apache.ibatis.annotations.Mapper;
 
-import com.zyl.mypro.bean.Cost;
+import java.util.List;
 
 @Mapper
 public interface CostMapper {
@@ -12,6 +13,8 @@ public interface CostMapper {
     int insertSelective(Cost record);
 
     Cost selectByPrimaryKey(Integer id);
+
+    List<Cost> listByEntCode(String entCode);
 
     int updateByPrimaryKeySelective(Cost record);
 

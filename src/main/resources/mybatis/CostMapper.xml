@@ -16,7 +16,13 @@
     <include refid="Base_Column_List" />
     from cost where id = #{id}
   </select>
-  
+
+  <select id="listByEntCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from cost where ent_code = #{entCode}
+  </select>
+
   <insert id="insert" parameterType="com.zyl.mypro.bean.Cost">
     insert into cost (id, money, ent_code)
     values (#{id,jdbcType=INTEGER}, #{money,jdbcType=INTEGER}, #{entCode})
