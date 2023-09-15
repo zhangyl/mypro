@@ -65,6 +65,15 @@ public class IndexController {
 	@GetMapping("/shardingsphereTest")
 	@ResponseBody
 	public List<Cost> shardingsphereTest(HttpServletRequest request){
+		{
+			//测试插入带人工生成id插入，没有问题
+			Cost cost = new Cost();
+			cost.setId(1);//模拟人工生成id
+			cost.setEntCode("zyl");
+			cost.setMoney(800);
+			costService.insert(cost);
+		}
+
 		//不分表
 		User user = userMapper.selectByPrimaryKey(1);
 		log.info("------------------" + user);
