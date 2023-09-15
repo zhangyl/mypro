@@ -45,8 +45,9 @@ spring:
         sharding-algorithms:
           my-table:
             type: Tenement #自定义分表。见：com.zyl.mypro.sharding.TenementShardingAlgorithm
-            #props:
-            #  algorithm-expression: cost_$->{id%2}
+            props:
+              special-tenement: zyl, wqc, ljq #配置大租户sharding-column值,英文逗号分割
+              mod-number: 2 #配置普通租户分表总数
         tables:
           cost:
             actual-data-nodes: ds0.cost_0, ds0.cost_1, ds0.cost_zyl
