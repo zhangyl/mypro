@@ -1,6 +1,8 @@
 package com.zyl.mypro.controller;
 
 import com.zyl.mypro.bean.Cost;
+import com.zyl.mypro.bean.User;
+import com.zyl.mypro.mapper.UserMapper;
 import com.zyl.mypro.service.CostService;
 import com.zyl.mypro.util.JwtUtil;
 import org.slf4j.Logger;
@@ -25,6 +27,9 @@ public class IndexController {
 	int count = 0;
 	@Autowired(required = false)
 	CostService costService;
+
+	@Autowired
+	UserMapper userMapper;
 	
 	//模拟beta用户
 	private final Set<String> betaSet = new HashSet<>();
@@ -60,7 +65,13 @@ public class IndexController {
 	@GetMapping("/shardingsphereTest")
 	@ResponseBody
 	public List<Cost> shardingsphereTest(HttpServletRequest request){
-
+		//不分表
+		User user = userMapper.selectByPrimaryKey(1);
+		log.info("------------------" + user);
+		//分表但不带分表列条件
+		Cost cost = costService.select(4);
+		log.info("------------------" + cost);
+		//分表带分表列条件
 		String entCode = request.getParameter("entCode");
 		List<Cost> costList = costService.listByEntCode(entCode);
 
