@@ -5,10 +5,11 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="money" jdbcType="INTEGER" property="money" />
     <result column="ent_code" jdbcType="VARCHAR" property="entCode" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   
   <sql id="Base_Column_List">
-    id, money, ent_code
+    id, money, ent_code, create_time
   </sql>
   
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -17,10 +18,16 @@
     from cost where id = #{id}
   </select>
 
-  <select id="listByEntCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="listByEntCode" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
-    from cost where ent_code = #{entCode}
+    from cost
+    where ent_code = #{entCode}
+    <if test="createTime != null">
+      <![CDATA[
+        and create_time <= #{createTime}
+      ]]>
+    </if>
   </select>
 
   <insert id="insert" parameterType="com.zyl.mypro.bean.Cost">

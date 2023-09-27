@@ -71,7 +71,7 @@ public class IndexController {
 			cost.setId(1);//模拟人工生成id
 			cost.setEntCode("zyl");
 			cost.setMoney(800);
-			costService.insert(cost);
+//			costService.insert(cost);
 		}
 
 		//不分表
@@ -82,7 +82,12 @@ public class IndexController {
 		log.info("------------------" + cost);
 		//分表带分表列条件
 		String entCode = request.getParameter("entCode");
-		List<Cost> costList = costService.listByEntCode(entCode);
+
+		// 模拟自定义复杂TenementComplexShardingAlgorithm分表策略，2022年之前的查询走 _before_2022后缀表
+		Calendar c = Calendar.getInstance();
+		c.set(2021, 10, 10);
+		Date date = c.getTime();
+		List<Cost> costList = costService.listByEntCode(entCode, date);
 
 		if(costList.isEmpty()) {
 			log.debug("查询Cost结果为空");
