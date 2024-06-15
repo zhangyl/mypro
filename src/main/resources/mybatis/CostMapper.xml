@@ -10,18 +10,18 @@
   <sql id="Base_Column_List">
     id, money, ent_code
   </sql>
-  
+
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from cost where id = #{id}
+  </select>
+  <!--模拟指定切换postgres数据库下走到的sql-->
+  <select id="selectByPrimaryKey" databaseId="postgres" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from cost where id = #{id}
-    union all
-    select
-    <include refid="Base_Column_List" />
-    from cost where money > #{id}
-    union all
-	select id, money, ent_code from (select id, money, ent_code from cost a where a.id = 50 ) b 
-    where money > 200
+      and money > 200
   </select>
   
   <insert id="insert" parameterType="com.zyl.mypro.bean.Cost">

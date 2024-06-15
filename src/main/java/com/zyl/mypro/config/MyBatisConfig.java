@@ -2,10 +2,13 @@ package com.zyl.mypro.config;
 
 import java.beans.PropertyVetoException;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.apache.ibatis.mapping.DatabaseIdProvider;
+import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
@@ -31,7 +34,13 @@ public class MyBatisConfig {
     private String jdbcUser;
     @Value("${spring.datasource.password}")
     private String jdbcPassword;
-    
+
+
+    @Value("${dataBaseProviderIdKey:MySQL}")
+    private String dataBaseProviderIdKey;
+    @Value("${dataBaseProviderIdValue:mysql}")
+    private String dataBaseProviderIdValue;
+
     @Autowired(required = false)
     @Lazy
 	CostService costService;
@@ -53,12 +62,26 @@ public class MyBatisConfig {
     @Bean
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+
         sessionFactory.setDataSource(dataSource);
+
+        //默认mysql，如果切换到其它数据库，需要单独自行配置
+        {
+            Properties properties = new Properties();
+
+            properties.put(dataBaseProviderIdKey, dataBaseProviderIdValue);
+            DatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
+
+            databaseIdProvider.setProperties(properties);
+
+            sessionFactory.setDatabaseIdProvider(databaseIdProvider);
+        }
+
+
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         sessionFactory.setMapperLocations(resolver.getResources("classpath:mybatis/*Mapper.xml"));
 
 
-        
         //灰度拦截器企业用户
 //		CanaryInterceptor mybatisInterceptor = new CanaryInterceptor(new CanaryEntCodeHook() {
 //			@Override
