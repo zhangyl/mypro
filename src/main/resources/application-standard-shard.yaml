@@ -44,26 +44,20 @@ spring:
       sharding:
         sharding-algorithms:
           my-table:
-            type: CLASS_BASED # TenementComplex #自定义分表。见：com.zyl.mypro.sharding.*ShardingAlgorithm
+            type: Tenement #自定义分表。见：com.zyl.mypro.sharding.TenementShardingAlgorithm
             props:
               special-tenement: zyl, wqc, ljq #配置大租户sharding-column值,英文逗号分割
               mod-number: 2 #配置普通租户分表总数
-              strategy: complex
-              algorithmClassName: com.zyl.mypro.sharding.TenementComplexShardingAlgorithm
         tables:
           cost:
-            actual-data-nodes: ds0.cost_0, ds0.cost_1, ds0.cost_zyl, ds0.cost_zyl_2021
-            table-strategy:
-              complex:
-              #standard:
-                sharding-columns: ent_code,create_time
+            actual-data-nodes: ds0.cost_0, ds0.cost_1, ds0.cost_zyl
+            tableStrategy:
+              standard:
+                sharding-column: ent_code
                 sharding-algorithm-name: my-table
 
-## 下面两个配置故意把mysql伪装成postgres
-dataBaseProviderIdKey: MySQL
-dataBaseProviderIdValue: postgres
-#mybatis配置采用java配置，所以注释掉。见：com.zyl.mypro.config.MyBatisConfig
-# mybatis:
+  #mybatis配置采用java配置，所以注释掉。见：com.zyl.mypro.config.MyBatisConfig
+  # mybatis:
   # mapper-locations: classpath:mybatis/*Mapper.xml
   # config-location: classpath:mybatis-config.xml
 

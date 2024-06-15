@@ -2,13 +2,9 @@ package com.zyl.mypro.bean;
 
 import java.util.Date;
 
-public class Cost {
-
+public class User {
     private Integer id;
-
-    private Integer money;
-    
-    private String entCode;
+    private String name;
 
     private Date createTime;
 
@@ -20,20 +16,12 @@ public class Cost {
         this.id = id;
     }
 
-    public Integer getMoney() {
-        return money;
+    public String getName() {
+        return name;
     }
 
-    public void setMoney(Integer money) {
-        this.money = money;
-    }
-
-    public String getEntCode() {
-        return entCode;
-    }
-
-    public void setEntCode(String entCode) {
-        this.entCode = entCode;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Date getCreateTime() {

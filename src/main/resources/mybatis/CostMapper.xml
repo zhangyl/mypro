@@ -5,10 +5,11 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="money" jdbcType="INTEGER" property="money" />
     <result column="ent_code" jdbcType="VARCHAR" property="entCode" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   
   <sql id="Base_Column_List">
-    id, money, ent_code
+    id, money, ent_code, create_time
   </sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -18,12 +19,12 @@
   </select>
   <!--模拟指定切换postgres数据库下走到的sql-->
   <select id="selectByPrimaryKey" databaseId="postgres" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from cost where id = #{id}
       and money > 200
   </select>
-  
+
   <insert id="insert" parameterType="com.zyl.mypro.bean.Cost">
     insert into cost (id, money, ent_code)
     values (#{id,jdbcType=INTEGER}, #{money,jdbcType=INTEGER}, #{entCode})
