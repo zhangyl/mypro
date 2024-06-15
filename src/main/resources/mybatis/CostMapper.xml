@@ -25,6 +25,18 @@
       and money > 200
   </select>
 
+  <select id="listByEntCode" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from cost
+    where ent_code = #{entCode}
+    <if test="createTime != null">
+      <![CDATA[
+        and create_time <= #{createTime}
+      ]]>
+    </if>
+  </select>
+
   <insert id="insert" parameterType="com.zyl.mypro.bean.Cost">
     insert into cost (id, money, ent_code)
     values (#{id,jdbcType=INTEGER}, #{money,jdbcType=INTEGER}, #{entCode})
