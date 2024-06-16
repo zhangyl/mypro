@@ -17,4 +17,8 @@
     from t_user where id = #{id}
   </select>
 
+  <update id="updateById">
+    update t_user set create_time = now() where id = #{id}
+  </update>
+
 </mapper>

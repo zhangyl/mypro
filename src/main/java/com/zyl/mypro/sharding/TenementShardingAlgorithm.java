@@ -45,7 +45,7 @@ public final class TenementShardingAlgorithm implements StandardShardingAlgorith
         return null;
     }
 
-    @Override
+
     public Properties getProps() {
         return props;
     }

@@ -26,7 +26,6 @@ public final class TenementComplexShardingAlgorithm implements ComplexKeysShardi
 
 
 
-    @Override
     public Properties getProps() {
         return props;
     }

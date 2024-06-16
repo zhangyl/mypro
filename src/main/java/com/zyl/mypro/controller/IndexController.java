@@ -99,10 +99,23 @@ public class IndexController {
     @ResponseBody
     public HelloVO login(HttpServletRequest request, 
     		HttpServletResponse response){
+
+		User user = userMapper.selectByPrimaryKey(1);
+
+		userMapper.updateById(1);
+
     	String name = request.getParameter("name");
     	HelloVO vo = new HelloVO();
     	vo.setName(name);
     	vo.setMessage("Hello " + name);
+
+
+		int r = userMapper.updateById(1);
+
+		if(r > 0) {
+			return vo;
+		}
+
     	Cost cost = costService.select(1);
     	if(cost != null) {
     		vo.setBeta("b");

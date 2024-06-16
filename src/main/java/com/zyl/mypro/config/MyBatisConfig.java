@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import com.zyl.mypro.aop.SqlStatementInterceptor;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -26,6 +27,10 @@ import com.zyl.mypro.service.CostService;
 @Configuration
 @MapperScan(value = "com.zyl.mypro.mapper")
 public class MyBatisConfig {
+
+    @Autowired
+    private SqlStatementInterceptor sqlStatementInterceptor;
+
     @Value("${spring.datasource.driver-class-name}")
     private String jdbcDriver;
     @Value("${spring.datasource.url}")
@@ -86,7 +91,9 @@ public class MyBatisConfig {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         sessionFactory.setMapperLocations(resolver.getResources("classpath:mybatis/*Mapper.xml"));
 
+//        SqlStatementInterceptor interceptor = new SqlStatementInterceptor();
 
+        sessionFactory.setPlugins(sqlStatementInterceptor);
         //灰度拦截器企业用户
 //		CanaryInterceptor mybatisInterceptor = new CanaryInterceptor(new CanaryEntCodeHook() {
 //			@Override
