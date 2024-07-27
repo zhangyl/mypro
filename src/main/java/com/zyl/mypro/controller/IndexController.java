@@ -102,15 +102,22 @@ public class IndexController {
 
 		User user = userMapper.selectByPrimaryKey(1);
 
-		userMapper.updateById(1);
+//		userMapper.updateById(1);
 
     	String name = request.getParameter("name");
     	HelloVO vo = new HelloVO();
     	vo.setName(name);
     	vo.setMessage("Hello " + name);
 
+//		List<Integer> idList = new ArrayList<>();
+//		idList.add(1);
+//		idList.add(2);
 
-		int r = userMapper.updateById(1);
+		User user1 = new User();
+		user1.setId(1);
+		user1.setName("zhangsan");
+		user1.setUpdateTime(new Date());
+		int r = userMapper.updateUserById(user1);
 
 		if(r > 0) {
 			return vo;

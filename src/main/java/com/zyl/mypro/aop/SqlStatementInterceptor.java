@@ -17,10 +17,14 @@ import org.apache.ibatis.logging.jdbc.PreparedStatementLogger;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.mapping.ParameterMode;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeException;
+import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,8 +32,12 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 
@@ -57,7 +65,7 @@ public class SqlStatementInterceptor implements Interceptor {
         Configuration configuration = ms.getConfiguration();
         BoundSql boundSql = ms.getBoundSql(parameter);
 
-        String origSql = realSql(configuration, boundSql);
+        String origSql = realSqlParam(configuration, boundSql);
 
         SQLStatement sqlStatement = SQLUtils.parseSingleStatement(origSql, "mysql");
 
@@ -136,29 +144,78 @@ public class SqlStatementInterceptor implements Interceptor {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         // sql语句中多个空格都用一个空格代替
         String sql = boundSql.getSql().replaceAll("[\\s]+", " ");
-        if (CollectionUtils.isNotEmpty(parameterMappings) && parameterObject != null) {
-            // 获取类型处理器注册器，类型处理器的功能是进行java类型和数据库类型的转换
-            TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
-            // 如果根据parameterObject.getClass(）可以找到对应的类型，则替换
-            if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
-                sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(parameterObject)));
+        if (CollectionUtils.isEmpty(parameterMappings) || parameterObject == null) {
+            return sql;
+        }
+        // 获取类型处理器注册器，类型处理器的功能是进行java类型和数据库类型的转换
+        TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
+        // 如果根据parameterObject.getClass(）可以找到对应的类型，则替换
+        if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+            sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(parameterObject)));
+            return sql;
+        }
+        // MetaObject主要是封装了originalObject对象，提供了get和set的方法用于获取和设置originalObject的属性值,
+        // 主要支持对JavaBean、Collection、Map三种类型对象的操作
+        MetaObject metaObject = configuration.newMetaObject(parameterObject);
+        for (ParameterMapping parameterMapping : parameterMappings) {
+            String propertyName = parameterMapping.getProperty();
+            if (metaObject.hasGetter(propertyName)) {
+                Object obj = metaObject.getValue(propertyName);
+                sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
+            } else if (boundSql.hasAdditionalParameter(propertyName)) {
+                // 该分支是动态sql
+                Object obj = boundSql.getAdditionalParameter(propertyName);
+                sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
             } else {
-                // MetaObject主要是封装了originalObject对象，提供了get和set的方法用于获取和设置originalObject的属性值,
-                // 主要支持对JavaBean、Collection、Map三种类型对象的操作
-                MetaObject metaObject = configuration.newMetaObject(parameterObject);
-                for (ParameterMapping parameterMapping : parameterMappings) {
-                    String propertyName = parameterMapping.getProperty();
-                    if (metaObject.hasGetter(propertyName)) {
-                        Object obj = metaObject.getValue(propertyName);
-                        sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
-                    } else if (boundSql.hasAdditionalParameter(propertyName)) {
-                        // 该分支是动态sql
-                        Object obj = boundSql.getAdditionalParameter(propertyName);
-                        sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
-                    } else {
-                        // 打印出缺失，提醒该参数缺失并防止错位
-                        sql = sql.replaceFirst("\\?", "缺失");
-                    }
+                // 打印出缺失，提醒该参数缺失并防止错位
+                sql = sql.replaceFirst("\\?", "缺失");
+            }
+        }
+        return sql;
+    }
+
+    public String realSqlParam(Configuration configuration, BoundSql boundSql) {
+
+        String sql = boundSql.getSql().replaceAll("[\\s]+", " ");
+
+        Object parameterObject = boundSql.getParameterObject();
+        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+
+        TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
+
+        if (parameterMappings == null || parameterMappings.isEmpty()) {
+            return sql;
+        }
+
+        for (int i = 0; i < parameterMappings.size(); i++) {
+            ParameterMapping parameterMapping = parameterMappings.get(i);
+            if (parameterMapping.getMode() != ParameterMode.OUT) {
+                Object value = null;
+                String propertyName = parameterMapping.getProperty();
+                if (boundSql.hasAdditionalParameter(propertyName)) {
+                    value = boundSql.getAdditionalParameter(propertyName);
+                } else if (value == null && parameterObject == null) {
+                    value = null;
+                } else if (value == null && typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+                    value = parameterObject;
+                } else {
+                    MetaObject metaObject = configuration.newMetaObject(parameterObject);
+                    value = metaObject.getValue(propertyName);
+                }
+
+                // value 转换
+                if (value == null) {
+                    sql = sql.replaceFirst("\\?", "null");
+                } else if(value instanceof String) {
+                    sql = sql.replaceFirst("\\?", "'" + value + "'");
+                } else if(value instanceof Date) {
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    sql = sql.replaceFirst("\\?", "'" + format.format((Date)value) + "'");
+                } else if(value instanceof LocalDate) {
+                    String v = ((LocalDate) value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    sql = sql.replaceFirst("\\?", "'" + v + "'");
+                } else {
+                    sql = sql.replaceFirst("\\?", value.toString());
                 }
             }
         }
