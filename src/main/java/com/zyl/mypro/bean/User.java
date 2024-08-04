@@ -6,6 +6,8 @@ public class User {
     private Integer id;
     private String name;
 
+    private MyNameEnum nameEnum;
+
     private Date createTime;
     private Date updateTime;
 
@@ -39,5 +41,13 @@ public class User {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public MyNameEnum getNameEnum() {
+        return nameEnum;
+    }
+
+    public void setNameEnum(MyNameEnum nameEnum) {
+        this.nameEnum = nameEnum;
     }
 }

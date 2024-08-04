@@ -6,6 +6,7 @@ import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import com.mysql.cj.jdbc.ClientPreparedStatement;
+import com.mysql.cj.jdbc.ServerPreparedStatement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,9 +43,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 @Component
-@Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class,Object.class}),
+@Intercepts({
+//    @Signature(type = Executor.class, method = "update", args = {MappedStatement.class,Object.class}),
 //    @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}),
-//    @Signature(type = StatementHandler.class, method = "batch", args = {Statement.class})
+    @Signature(type = StatementHandler.class, method = "update", args = {Statement.class})
 })
 
 
@@ -56,40 +58,68 @@ public class SqlStatementInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
 
         final Object[] args = invocation.getArgs();
-        MappedStatement ms = (MappedStatement) args[0];
-        Object parameter = null;
-        if (invocation.getArgs().length > 1) {
-            parameter = invocation.getArgs()[1];
-        }
-        String sqlId = ms.getId();
-        Configuration configuration = ms.getConfiguration();
-        BoundSql boundSql = ms.getBoundSql(parameter);
 
-        String origSql = realSqlParam(configuration, boundSql);
+        Statement statement = (Statement)args[0];
 
-        SQLStatement sqlStatement = SQLUtils.parseSingleStatement(origSql, "mysql");
+        String driverSql = null;
 
-        if(sqlStatement instanceof SQLUpdateStatement) {
-            Object result = realTarget(invocation.getArgs()[0]);
+        if(statement != null) {
+            Object obj = realTarget(statement);
+            if(obj instanceof DruidPooledPreparedStatement) {
+                DruidPooledPreparedStatement druidPooledPreparedStatement = (DruidPooledPreparedStatement)obj;
 
-            System.out.println("执行的SQL result=" + result);
-            System.out.println("执行的SQL: \n" + origSql);
-            System.out.println("执行的SQL sqlStatement: \n" + sqlStatement);
+//                driverSql = getRealSql(druidPooledPreparedStatement);
+                driverSql = druidPooledPreparedStatement.toString();
 
-            List<Map<String, Object>> beforeImageList = sqlStatementProxyHandler.beforeImage((SQLUpdateStatement)sqlStatement);
-            System.out.println("执行SQL前数据: \n" + beforeImageList);
+            } else if(obj instanceof PreparedStatementLogger) {
+                PreparedStatementLogger preparedStatementLogger = (PreparedStatementLogger)obj;
+                PreparedStatement preparedStatement = preparedStatementLogger.getPreparedStatement();
 
-            Object o = invocation.proceed();
+                if(preparedStatement instanceof DruidPooledPreparedStatement) {
+                    DruidPooledPreparedStatement druidPooledPreparedStatement = (DruidPooledPreparedStatement)preparedStatement;
+//                    driverSql = getRealSql(druidPooledPreparedStatement);
+                    driverSql = druidPooledPreparedStatement.toString();
+                }
+            }
+            driverSql = driverSql.replaceAll("[\\n]+", "");
+            driverSql = driverSql.replaceAll("[\\s]+", " ");
+//            String origSql = driverSql;
+            String origSql = driverSql.split(": ")[1];
+            SQLStatement sqlStatement = SQLUtils.parseSingleStatement(origSql, "mysql");
 
-            List<Map<String, Object>> afterImageList = sqlStatementProxyHandler.afterImage((SQLUpdateStatement)sqlStatement, null, beforeImageList);
-            System.out.println("执行SQL后数据: \n" + afterImageList);
+            if(sqlStatement instanceof SQLUpdateStatement) {
 
-            return o;
+                System.out.println("执行的SQL: \n" + origSql);
+
+                List<Map<String, Object>> beforeImageList = sqlStatementProxyHandler.beforeImage((SQLUpdateStatement)sqlStatement);
+                System.out.println("执行SQL前数据: \n" + beforeImageList);
+
+                Object o = invocation.proceed();
+
+                List<Map<String, Object>> afterImageList = sqlStatementProxyHandler.afterImage((SQLUpdateStatement)sqlStatement, null, beforeImageList);
+                System.out.println("执行SQL后数据: \n" + afterImageList);
+
+                return o;
+            }
         }
 
         Object o = invocation.proceed();
         // 继续执行后续操作
         return o;
+    }
+
+    private static String getRealSql(DruidPooledPreparedStatement druidPooledPreparedStatement)
+        throws SQLException {
+        // 如果是mql
+        Statement realStatement = druidPooledPreparedStatement.getStatement();
+        if(realStatement instanceof ServerPreparedStatement) {
+            ServerPreparedStatement serverPreparedStatement = (ServerPreparedStatement)realStatement;
+            return serverPreparedStatement.asSql();
+        } else if(realStatement instanceof ClientPreparedStatement) {
+            ClientPreparedStatement clientPreparedStatement = (ClientPreparedStatement)realStatement;
+            return clientPreparedStatement.asSql();
+        }
+        return "";
     }
 
     /**
