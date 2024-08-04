@@ -68,8 +68,8 @@ public class SqlStatementInterceptor implements Interceptor {
             if(obj instanceof DruidPooledPreparedStatement) {
                 DruidPooledPreparedStatement druidPooledPreparedStatement = (DruidPooledPreparedStatement)obj;
 
-//                driverSql = getRealSql(druidPooledPreparedStatement);
-                driverSql = druidPooledPreparedStatement.toString();
+                driverSql = getRealSql(druidPooledPreparedStatement);
+//                driverSql = druidPooledPreparedStatement.toString();
 
             } else if(obj instanceof PreparedStatementLogger) {
                 PreparedStatementLogger preparedStatementLogger = (PreparedStatementLogger)obj;
@@ -77,8 +77,8 @@ public class SqlStatementInterceptor implements Interceptor {
 
                 if(preparedStatement instanceof DruidPooledPreparedStatement) {
                     DruidPooledPreparedStatement druidPooledPreparedStatement = (DruidPooledPreparedStatement)preparedStatement;
-//                    driverSql = getRealSql(druidPooledPreparedStatement);
-                    driverSql = druidPooledPreparedStatement.toString();
+                    driverSql = getRealSql(druidPooledPreparedStatement);
+//                    driverSql = druidPooledPreparedStatement.toString();
                 }
             }
             driverSql = driverSql.replaceAll("[\\n]+", "");
@@ -110,12 +110,12 @@ public class SqlStatementInterceptor implements Interceptor {
 
     private static String getRealSql(DruidPooledPreparedStatement druidPooledPreparedStatement)
         throws SQLException {
-        // 如果是mql
+        // 如果是mysql
         Statement realStatement = druidPooledPreparedStatement.getStatement();
-        if(realStatement instanceof ServerPreparedStatement) {
+        if(realStatement instanceof ServerPreparedStatement) {//数据库useServerPrepStmts=true
             ServerPreparedStatement serverPreparedStatement = (ServerPreparedStatement)realStatement;
-            return serverPreparedStatement.asSql();
-        } else if(realStatement instanceof ClientPreparedStatement) {
+            return serverPreparedStatement.asSql(true);
+        } else if(realStatement instanceof ClientPreparedStatement) {//数据库useServerPrepStmts=false
             ClientPreparedStatement clientPreparedStatement = (ClientPreparedStatement)realStatement;
             return clientPreparedStatement.asSql();
         }
