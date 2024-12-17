@@ -114,10 +114,12 @@ public class SqlStatementInterceptor implements Interceptor {
         Statement realStatement = druidPooledPreparedStatement.getStatement();
         if(realStatement instanceof ServerPreparedStatement) {//数据库useServerPrepStmts=true
             ServerPreparedStatement serverPreparedStatement = (ServerPreparedStatement)realStatement;
-            return serverPreparedStatement.asSql(true);
+            return serverPreparedStatement.getPreparedSql();
+//            return serverPreparedStatement.asSql(true);
         } else if(realStatement instanceof ClientPreparedStatement) {//数据库useServerPrepStmts=false
             ClientPreparedStatement clientPreparedStatement = (ClientPreparedStatement)realStatement;
-            return clientPreparedStatement.asSql();
+            return clientPreparedStatement.getPreparedSql();
+//            return clientPreparedStatement.asSql();
         }
         return "";
     }

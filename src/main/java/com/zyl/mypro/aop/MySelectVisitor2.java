@@ -3,7 +3,7 @@ package com.zyl.mypro.aop;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLObject;
@@ -17,6 +17,7 @@ import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitorAdapter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 查询语句字段追加
@@ -43,9 +44,6 @@ public class MySelectVisitor2 extends MySqlASTVisitorAdapter {
 
     /**
      * sql改写，动态拼接in demo
-     * @param x
-     * @param where
-     * @return
      */
     public SQLExpr getNewExprIn(List<TableInfo> tableInfoList, SQLBinaryOpExpr x) {
 		SQLExpr allOpExpr = x;

@@ -67,4 +67,19 @@ dataBaseProviderIdValue: postgres
 # mybatis:
   # mapper-locations: classpath:mybatis/*Mapper.xml
   # config-location: classpath:mybatis-config.xml
-
+elasticjob:
+  regCenter:
+    #zookeeper 的ip:port
+    serverLists: 127.0.0.1:2181
+    #名命空间，自己定义就好了
+    namespace: my-job4
+    digest: zyl:Xe7+HMYId2eNV48821ZrcFwIqIE=:cdrwa
+  jobs:
+    #你的这个定时任务名称，自定义名称
+    myElasticJob:
+      #定时任务的全路径名
+      elasticJobClass: com.zyl.mypro.job.MyElasticJob
+      #定时任务执行的cron表达式
+      cron: 0/20 * * * * ?
+      #分片数量
+      shardingTotalCount: 1
