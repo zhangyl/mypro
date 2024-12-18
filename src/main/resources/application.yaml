@@ -67,10 +67,11 @@ dataBaseProviderIdValue: postgres
 # mybatis:
   # mapper-locations: classpath:mybatis/*Mapper.xml
   # config-location: classpath:mybatis-config.xml
+# elasticjob.reg-center.digest=zyl:Xe7+HMYId2eNV48821ZrcFwIqIE=:cdrwa
 elasticjob:
-  regCenter:
+  reg-center:
     #zookeeper 的ip:port
-    serverLists: 127.0.0.1:2181
+    server-lists: 127.0.0.1:2181
     #名命空间，自己定义就好了
     namespace: my-job4
     digest: zyl:Xe7+HMYId2eNV48821ZrcFwIqIE=:cdrwa
